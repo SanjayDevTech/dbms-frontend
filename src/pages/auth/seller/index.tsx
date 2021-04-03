@@ -1,7 +1,11 @@
-import React from "react";
+import Auth from "components/auth";
 
 const SellerAuthPage = () => {
-	return <h1>Seller Login</h1>;
+	const authHandler = (email: any, pwd: any, mode: string) => {
+		console.log(`Seller => Email: ${email}, Pwd: ${pwd}, Mode: ${mode}`);
+	};
+
+	return <Auth option="seller" handler={authHandler} />;
 };
 
 export default SellerAuthPage;

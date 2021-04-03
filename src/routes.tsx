@@ -9,7 +9,7 @@ const HomePage = lazy(() => import("pages/home"));
 const UserAuthPage = lazy(() => import("pages/auth/user"));
 const SellerAuthPage = lazy(() => import("pages/auth/seller"));
 const ProductOverviewPage = lazy(() => import("pages/product"));
-const CheckoutPage = lazy(() => import("pages/checkout"));
+const CartPage = lazy(() => import("pages/cart"));
 
 const Routes = () => {
 	return (
@@ -28,8 +28,8 @@ const Routes = () => {
 					<Route exact path={"/product/:productId"}>
 						<ProductOverviewPage />
 					</Route>
-					<Route exact path={"/checkout"}>
-						<CheckoutPage />
+					<Route exact path={"/cart"}>
+						<CartPage />
 					</Route>
 					<Route exact path={"/loading"}>
 						<LoadingPage />

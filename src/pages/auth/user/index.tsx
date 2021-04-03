@@ -1,7 +1,11 @@
-import React from "react";
+import Auth from "components/auth";
 
 const UserAuthPage = () => {
-	return <h1>User Login</h1>;
+	const authHandler = (email: string, pwd: string, mode: string) => {
+		console.log(`User => Email: ${email}, Pwd: ${pwd}, Mode: ${mode}`);
+	};
+
+	return <Auth option="user" handler={authHandler} />;
 };
 
 export default UserAuthPage;

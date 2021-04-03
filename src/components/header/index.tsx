@@ -12,9 +12,12 @@ import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
+import Menu from "@material-ui/core/Menu";
+import MenuItem from "@material-ui/core/MenuItem";
 import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import { ShoppingCart } from "@material-ui/icons";
+import history from "utils/history";
 
 const CurvedButton = withStyles((theme: Theme) => ({
 	root: {
@@ -42,6 +45,9 @@ const JoinButton = withStyles((theme: Theme) => ({
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
+		root: {
+			display: "flex",
+		},
 		grow: {
 			flexGrow: 1,
 		},
@@ -74,37 +80,80 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const Header = () => {
 	const classes = useStyles();
+
+	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const userNavHandler = () => {
+		handleClose();
+		history.push("/auth/user");
+	};
+
+	const sellerNavHandler = () => {
+		handleClose();
+		history.push("/auth/seller");
+	};
+
+	const cartNavHandler = () => {
+		history.push("/cart");
+	};
+
 	return (
-		<div className={classes.grow}>
-			<AppBar className={classes.appbar} position="static">
-				<Toolbar>
-					<Typography variant="h6" noWrap>
-						E Commerce
-					</Typography>
-					<div className={classes.grow} />
-					<div className={classes.search}>
-						<InputBase
-							placeholder={"Search products, accessories"}
-							className={classes.input}
-						/>
-						<CurvedButton>
-							<SearchIcon className={classes.icon} />
-						</CurvedButton>
-					</div>
-					<div className={classes.grow} />
-					<div className={classes.section}>
-						{/* <IconButton aria-label="account of current user" onClick={() => {}}>
+		<div className={classes.root}>
+			<div className={classes.grow}>
+				<AppBar className={classes.appbar} position="static">
+					<Toolbar>
+						<Typography variant="h6" noWrap>
+							E Commerce
+						</Typography>
+						<div className={classes.grow} />
+						<div className={classes.search}>
+							<InputBase
+								placeholder={"Search products, accessories"}
+								className={classes.input}
+							/>
+							<CurvedButton>
+								<SearchIcon className={classes.icon} />
+							</CurvedButton>
+						</div>
+						<div className={classes.grow} />
+						<div className={classes.section}>
+							{/* <IconButton aria-label="account of current user" onClick={() => {}}>
 							<AccountCircle className={classes.icon} />
 						</IconButton> */}
-						<JoinButton>JOIN</JoinButton>
-						<IconButton aria-label="show 17 new notifications">
-							<Badge badgeContent={17} color="secondary">
-								<ShoppingCart className={classes.icon} />
-							</Badge>
-						</IconButton>
-					</div>
-				</Toolbar>
-			</AppBar>
+							<JoinButton
+								aria-controls="simple-menu"
+								aria-haspopup="true"
+								onClick={handleClick}>
+								JOIN
+							</JoinButton>
+							<Menu
+								id="simple-menu"
+								anchorEl={anchorEl}
+								keepMounted
+								open={Boolean(anchorEl)}
+								onClose={handleClose}>
+								<MenuItem onClick={userNavHandler}>Join as user</MenuItem>
+								<MenuItem onClick={sellerNavHandler}>Join as seller</MenuItem>
+							</Menu>
+							<IconButton
+								onClick={cartNavHandler}
+								aria-label="show 17 new notifications">
+								<Badge badgeContent={17} color="secondary">
+									<ShoppingCart className={classes.icon} />
+								</Badge>
+							</IconButton>
+						</div>
+					</Toolbar>
+				</AppBar>
+			</div>
 		</div>
 	);
 };
