@@ -8,6 +8,7 @@ import {
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import InputBase from "@material-ui/core/InputBase";
 import Badge from "@material-ui/core/Badge";
@@ -19,12 +20,25 @@ const CurvedButton = withStyles((theme: Theme) => ({
 	root: {
 		borderRadius: "0 43px 43px 0",
 		width: 90,
-		backgroundColor: "#1565C0",
+		backgroundColor: theme.palette.secondary.main,
 		"&:hover": {
-			backgroundColor: "#1565C0",
+			backgroundColor: theme.palette.secondary.main,
 		},
 	},
 }))(IconButton);
+
+const JoinButton = withStyles((theme: Theme) => ({
+	root: {
+		width: 60,
+		height: 40,
+		borderRadius: "15px",
+		backgroundColor: "#FFF",
+		color: theme.palette.secondary.main,
+		"&:hover": {
+			backgroundColor: "#FFF",
+		},
+	},
+}))(Button);
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -44,9 +58,11 @@ const useStyles = makeStyles((theme: Theme) =>
 		input: {
 			flexGrow: 1,
 			paddingLeft: theme.spacing(2),
+			margin: "0 10px",
 		},
 		section: {
 			display: "flex",
+			alignItems: "center",
 		},
 		icon: {
 			color: "#FFF",
@@ -77,9 +93,10 @@ const Header = () => {
 					</div>
 					<div className={classes.grow} />
 					<div className={classes.section}>
-						<IconButton aria-label="account of current user" onClick={() => {}}>
+						{/* <IconButton aria-label="account of current user" onClick={() => {}}>
 							<AccountCircle className={classes.icon} />
-						</IconButton>
+						</IconButton> */}
+						<JoinButton>JOIN</JoinButton>
 						<IconButton aria-label="show 17 new notifications">
 							<Badge badgeContent={17} color="secondary">
 								<ShoppingCart className={classes.icon} />

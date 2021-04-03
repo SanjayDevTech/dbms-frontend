@@ -1,15 +1,15 @@
 import React, { Suspense, lazy } from "react";
 import { Router, Route, Switch } from "react-router-dom";
-import history from "./utils/history";
-import LoadingPage from "./pages/info/loading";
-import ErrorPage from "./pages/info/error";
-import Test from "./test";
+import history from "utils/history";
+import LoadingPage from "pages/info/loading";
+import ErrorPage from "pages/info/error";
+import Test from "test";
 
-const HomePage = lazy(() => import("./pages/home"));
-const UserAuthPage = lazy(() => import("./pages/auth/user"));
-const SellerAuthPage = lazy(() => import("./pages/auth/seller"));
-const ProductOverviewPage = lazy(() => import("./pages/product"));
-const CheckoutPage = lazy(() => import("./pages/checkout"));
+const HomePage = lazy(() => import("pages/home"));
+const UserAuthPage = lazy(() => import("pages/auth/user"));
+const SellerAuthPage = lazy(() => import("pages/auth/seller"));
+const ProductOverviewPage = lazy(() => import("pages/product"));
+const CheckoutPage = lazy(() => import("pages/checkout"));
 
 const Routes = () => {
 	return (
