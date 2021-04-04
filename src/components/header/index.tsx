@@ -18,6 +18,8 @@ import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import { ShoppingCart } from "@material-ui/icons";
 import history from "utils/history";
+import { useSelector } from "react-redux";
+import { selectCart } from "state/slices";
 
 const CurvedButton = withStyles((theme: Theme) => ({
 	root: {
@@ -83,6 +85,8 @@ const Header = () => {
 
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+	const cart = useSelector(selectCart);
+
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
@@ -143,10 +147,8 @@ const Header = () => {
 								<MenuItem onClick={userNavHandler}>Join as user</MenuItem>
 								<MenuItem onClick={sellerNavHandler}>Join as seller</MenuItem>
 							</Menu>
-							<IconButton
-								onClick={cartNavHandler}
-								aria-label="show 17 new notifications">
-								<Badge badgeContent={17} color="secondary">
+							<IconButton onClick={cartNavHandler}>
+								<Badge badgeContent={cart.length} color="secondary">
 									<ShoppingCart className={classes.icon} />
 								</Badge>
 							</IconButton>
