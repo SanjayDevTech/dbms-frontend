@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Box, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import Header from "components/header";
 import Product from "components/product";
 import { productList } from "fixtures/product";

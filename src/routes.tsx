@@ -1,9 +1,12 @@
 import React, { Suspense, lazy } from "react";
 import { Router, Route, Switch } from "react-router-dom";
+import { useSelector } from "react-redux";
 import history from "utils/history";
 import LoadingPage from "pages/info/loading";
 import ErrorPage from "pages/info/error";
 import Test from "test";
+import PrivateRoute from "components/privateRoute";
+import { selectSellerAuth } from "state/slices";
 
 const HomePage = lazy(() => import("pages/home"));
 const UserAuthPage = lazy(() => import("pages/auth/user"));
@@ -13,6 +16,8 @@ const CartPage = lazy(() => import("pages/cart"));
 const Dashboard = lazy(() => import("pages/dashboard"));
 
 const Routes = () => {
+	const seller = useSelector(selectSellerAuth);
+
 	return (
 		<Router history={history}>
 			<Suspense fallback={<LoadingPage />}>
@@ -35,9 +40,13 @@ const Routes = () => {
 					<Route exact path={"/test/:component"}>
 						<Test />
 					</Route>
-					<Route exact path={"/dashboard"}>
+					<PrivateRoute
+						auth={Boolean(seller.email && seller.hash)}
+						redirect={"/auth/seller"}
+						exact
+						path={"/dashboard"}>
 						<Dashboard />
-					</Route>
+					</PrivateRoute>
 					<Route>
 						<ErrorPage error={"404"} />
 					</Route>

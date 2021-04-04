@@ -9,9 +9,9 @@ const PrivateRoute = ({
 	...routeProps
 }: Types.PrivateRoutePropsI) => {
 	if (auth) {
-		<Route {...routeProps} />;
+		return <Route {...routeProps} />;
 	} else {
-		<Redirect to={redirect || "/"} />;
+		return <Redirect to={redirect || "/"} />;
 	}
 };
 

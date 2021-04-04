@@ -18,8 +18,9 @@ import SearchIcon from "@material-ui/icons/Search";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import { ShoppingCart } from "@material-ui/icons";
 import history from "utils/history";
-import { useSelector } from "react-redux";
-import { selectCart } from "state/slices";
+import { useSelector, useDispatch } from "react-redux";
+import { selectCart, selectUserAuth, selectSellerAuth } from "state/slices";
+import { AuthAction } from "state/actions";
 
 const CurvedButton = withStyles((theme: Theme) => ({
 	root: {
@@ -42,6 +43,7 @@ const JoinButton = withStyles((theme: Theme) => ({
 		"&:hover": {
 			backgroundColor: "#FFF",
 		},
+		marginLeft: "5px",
 	},
 }))(Button);
 
@@ -84,24 +86,49 @@ const Header = () => {
 	const classes = useStyles();
 
 	const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+	const [logoutEl, setLogoutEl] = React.useState<null | HTMLElement>(null);
+
+	const dispatch = useDispatch();
 
 	const cart = useSelector(selectCart);
+	const user = useSelector(selectUserAuth);
+	const seller = useSelector(selectSellerAuth);
 
-	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+	const handleJoinClick = (event: React.MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 
-	const handleClose = () => {
+	const handleLogoutClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setLogoutEl(event.currentTarget);
+	};
+
+	const sellerDashboardNavHandler = () => {
+		history.push("/dashboard");
+	};
+
+	const handleJoinClose = () => {
 		setAnchorEl(null);
 	};
 
+	const handleLogoutClose = () => {
+		setLogoutEl(null);
+	};
+
+	const handleUserLogout = () => {
+		dispatch(AuthAction.userLogoutAuth());
+		handleLogoutClose();
+	};
+
+	const handleSellerLogout = () => {
+		dispatch(AuthAction.sellerLogoutAuth());
+		handleLogoutClose();
+	};
+
 	const userNavHandler = () => {
-		handleClose();
 		history.push("/auth/user");
 	};
 
 	const sellerNavHandler = () => {
-		handleClose();
 		history.push("/auth/seller");
 	};
 
@@ -109,12 +136,16 @@ const Header = () => {
 		history.push("/cart");
 	};
 
+	const homeNavHandler = () => {
+		history.push("/");
+	};
+
 	return (
 		<div className={classes.root}>
 			<div className={classes.grow}>
 				<AppBar className={classes.appbar} position="static">
 					<Toolbar>
-						<Typography variant="h6" noWrap>
+						<Typography onClick={homeNavHandler} variant="h6" noWrap>
 							E Commerce
 						</Typography>
 						<div className={classes.grow} />
@@ -129,24 +160,66 @@ const Header = () => {
 						</div>
 						<div className={classes.grow} />
 						<div className={classes.section}>
-							{/* <IconButton aria-label="account of current user" onClick={() => {}}>
-							<AccountCircle className={classes.icon} />
-						</IconButton> */}
-							<JoinButton
-								aria-controls="simple-menu"
-								aria-haspopup="true"
-								onClick={handleClick}>
-								JOIN
-							</JoinButton>
-							<Menu
-								id="simple-menu"
-								anchorEl={anchorEl}
-								keepMounted
-								open={Boolean(anchorEl)}
-								onClose={handleClose}>
-								<MenuItem onClick={userNavHandler}>Join as user</MenuItem>
-								<MenuItem onClick={sellerNavHandler}>Join as seller</MenuItem>
-							</Menu>
+							{seller.email && seller.hash && (
+								<IconButton
+									aria-label="account of current user"
+									onClick={sellerDashboardNavHandler}>
+									<AccountCircle className={classes.icon} />
+								</IconButton>
+							)}
+							{(!(user.email && user.hash) ||
+								!(seller.email && seller.hash)) && (
+								<>
+									<JoinButton
+										aria-controls="simple-menu"
+										aria-haspopup="true"
+										onClick={handleJoinClick}>
+										JOIN
+									</JoinButton>
+									<Menu
+										id="simple-menu"
+										anchorEl={anchorEl}
+										keepMounted
+										open={Boolean(anchorEl)}
+										onClose={handleJoinClose}>
+										{!(user.email && user.hash) && (
+											<MenuItem onClick={userNavHandler}>Join as user</MenuItem>
+										)}
+										{!(seller.email && seller.hash) && (
+											<MenuItem onClick={sellerNavHandler}>
+												Join as seller
+											</MenuItem>
+										)}
+									</Menu>
+								</>
+							)}
+							{((user.email && user.hash) || (seller.email && seller.hash)) && (
+								<>
+									<JoinButton
+										aria-controls="logout"
+										aria-haspopup="true"
+										onClick={handleLogoutClick}>
+										LOGOUT
+									</JoinButton>
+									<Menu
+										id="logout"
+										anchorEl={logoutEl}
+										keepMounted
+										open={Boolean(logoutEl)}
+										onClose={handleLogoutClose}>
+										{user.email && user.hash && (
+											<MenuItem onClick={handleUserLogout}>
+												Logout as user
+											</MenuItem>
+										)}
+										{seller.email && seller.hash && (
+											<MenuItem onClick={handleSellerLogout}>
+												Logout as seller
+											</MenuItem>
+										)}
+									</Menu>
+								</>
+							)}
 							<IconButton onClick={cartNavHandler}>
 								<Badge badgeContent={cart.length} color="secondary">
 									<ShoppingCart className={classes.icon} />

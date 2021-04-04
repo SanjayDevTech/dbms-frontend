@@ -1,5 +1,5 @@
-import * as Cart from "./cart/actions";
-import * as Product from "./product/actions";
-import * as Auth from "./auth/actions";
+import * as CartAction from "./cart/actions";
+import * as ProductAction from "./product/actions";
+import * as AuthAction from "./auth/actions";
 
-export default { Cart, Product, Auth };
+export { CartAction, ProductAction, AuthAction };
