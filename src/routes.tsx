@@ -10,6 +10,7 @@ const UserAuthPage = lazy(() => import("pages/auth/user"));
 const SellerAuthPage = lazy(() => import("pages/auth/seller"));
 const ProductOverviewPage = lazy(() => import("pages/product"));
 const CartPage = lazy(() => import("pages/cart"));
+const Dashboard = lazy(() => import("pages/dashboard"));
 
 const Routes = () => {
 	return (
@@ -31,11 +32,11 @@ const Routes = () => {
 					<Route exact path={"/cart"}>
 						<CartPage />
 					</Route>
-					<Route exact path={"/loading"}>
-						<LoadingPage />
-					</Route>
 					<Route exact path={"/test/:component"}>
 						<Test />
+					</Route>
+					<Route exact path={"/dashboard"}>
+						<Dashboard />
 					</Route>
 					<Route>
 						<ErrorPage error={"404"} />
