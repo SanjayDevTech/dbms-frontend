@@ -3,7 +3,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Grid } from "@material-ui/core";
 import Header from "components/header";
 import Product from "components/product";
-import { productList } from "fixtures/product";
+import { useSelector, useDispatch } from "react-redux";
+import { selectProductData, selectProductStatus } from "state/slices";
+import { ProductAction } from "state/actions";
 
 const useStyles = makeStyles({
 	root: {
@@ -21,18 +23,25 @@ const useStyles = makeStyles({
 
 const HomePage = () => {
 	const classes = useStyles();
+	const dispatch = useDispatch();
+	const products = useSelector(selectProductData);
+
+	React.useEffect(() => {
+		dispatch(ProductAction.fetchRequestProduct());
+	}, []);
+
 	return (
 		<div className={classes.root}>
 			<Header />
 			<div className={classes.section}>
 				<Grid container spacing={2} justify="space-around">
-					{productList.length > 0 &&
-						productList.map((product) => (
-							<Grid key={product.productId} item>
+					{products.length > 0 &&
+						products.map((product) => (
+							<Grid key={product.id} item>
 								<Product
-									productId={product.productId}
-									cover={product.cover}
-									productName={product.productName}
+									productId={product.id}
+									cover={product.image}
+									productName={product.name}
 									price={product.price}
 								/>
 							</Grid>

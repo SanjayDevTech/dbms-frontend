@@ -1,5 +1,5 @@
 export interface ProductPropsI {
-	productId: string;
+	productId: number;
 	cover: string;
 	productName: string;
 	price: string;

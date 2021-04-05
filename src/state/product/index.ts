@@ -13,6 +13,9 @@ const productReducer = (
 	action: ActionType<any>
 ): ProductStateType => {
 	switch (action.type) {
+		case Action.PRODUCT_CLEAR:
+			return { product: state.product, loading: false, error: "" };
+
 		case Action.PRODUCT_FETCH_STATUS:
 			return { ...state, loading: action.payload, error: "" };
 

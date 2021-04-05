@@ -43,6 +43,8 @@ const useStyles = makeStyles({
 const Product = (props: Types.ProductPropsI) => {
 	const { productId, productName, cover, price } = props;
 
+	console.log(props);
+
 	const clickHandler = () => {
 		history.push(`/product/${productId}`);
 	};
@@ -51,11 +53,9 @@ const Product = (props: Types.ProductPropsI) => {
 	return (
 		<Card className={classes.root}>
 			<CardActionArea onClick={clickHandler} className={classes.action}>
-				<CardMedia
-					className={classes.media}
-					image={cover}
-					title={productName}
-				/>
+				<CardMedia className={classes.media} title={productName}>
+					<img width={"100%"} src={cover} alt={productName} />
+				</CardMedia>
 				<CardContent className={classes.content}>
 					<Typography
 						className={classes.title}

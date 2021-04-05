@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Button, ButtonGroup, Typography } from "@material-ui/core";
 import Header from "components/header";
-import { productList } from "fixtures/product";
 import { useParams } from "react-router";
+import { useSelector } from "react-redux";
+import { selectProductData } from "state/slices";
+import history from "utils/history";
 
 const useStyles = makeStyles({
 	root: {
@@ -53,10 +55,20 @@ const useStyles = makeStyles({
 
 const ProductOverviewPage = () => {
 	const classes = useStyles();
-	const { productId } = useParams<{ productId: string }>();
-	const { productName, price, cover } = productList.filter(
-		(p) => p.productId === productId
+	let { productId } = useParams<{ productId: any }>();
+	productId = Number(productId);
+
+	const products = useSelector(selectProductData);
+
+	const { name, price, image, des } = products.filter(
+		(p) => p.id === productId
 	)[0];
+
+	useEffect(() => {
+		if (!name) {
+			history.push("/");
+		}
+	}, []);
 
 	return (
 		<div className={classes.root}>
@@ -64,7 +76,7 @@ const ProductOverviewPage = () => {
 			<div className={classes.section}>
 				<div className={classes.left}>
 					<div>
-						<img width={"100%"} src={cover} alt={productName} />
+						<img width={"100%"} src={image} alt={name} />
 					</div>
 					<ButtonGroup color={"primary"} className={classes.btnBar}>
 						<Button variant={"contained"}>Buy now</Button>
@@ -73,13 +85,13 @@ const ProductOverviewPage = () => {
 				</div>
 				<div className={classes.right}>
 					<Typography className={classes.name} component={"h3"}>
-						{productName}
+						{name}
 					</Typography>
 					<Typography className={classes.price} component={"h3"}>
 						{price} $
 					</Typography>
 					<Typography className={classes.des} component={"p"}>
-						Description
+						{des}
 					</Typography>
 				</div>
 			</div>

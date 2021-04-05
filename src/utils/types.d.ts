@@ -3,7 +3,7 @@ export interface ProductType {
 	name: string;
 	des: string;
 	price: string;
-	cover: string;
+	image: string;
 	sellerId: number;
 }
 

@@ -21,11 +21,11 @@ export const fetchFailureProduct = (error: string): ActionType<string> => ({
 	payload: error,
 });
 
-export const fetchRequestProduct = () => {
+export const fetchRequestProduct = (query: string = "") => {
 	return (dispatch: Dispatch<ActionType<ProductType[] | string | boolean>>) => {
 		dispatch(fetchStatusProduct(true));
 		backendAPI
-			.get<ProductType[]>("/products")
+			.get<ProductType[]>("/products?query=" + query)
 			.then((res) => {
 				if (res.status === 200) {
 					const products = res.data;
@@ -35,7 +35,15 @@ export const fetchRequestProduct = () => {
 				}
 			})
 			.catch((e) => {
-				dispatch(fetchFailureProduct(e));
+				dispatch(fetchFailureProduct(e.message));
+			})
+			.finally(() => {
+				dispatch(fetchStatusProduct(false));
 			});
 	};
 };
+
+export const clearProduct = (): ActionType<string> => ({
+	type: Action.PRODUCT_CLEAR,
+	payload: "",
+});
