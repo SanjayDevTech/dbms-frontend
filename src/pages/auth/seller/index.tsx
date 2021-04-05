@@ -9,9 +9,14 @@ const SellerAuthPage = () => {
 	const dispatch = useDispatch();
 	const seller = useSelector(selectSellerAuth);
 
+	const [error, setError] = React.useState({ error: "" });
+
 	React.useEffect(() => {
 		if (seller.email && seller.hash) {
 			history.push("/");
+		}
+		if (seller.error) {
+			setError({ error: seller.error });
 		}
 	}, [seller]);
 
@@ -20,22 +25,22 @@ const SellerAuthPage = () => {
 			switch (mode) {
 				case "login":
 					dispatch(
-						AuthAction.sellerLoginAuth({
+						AuthAction.sellerRequestAuth({
 							email: email,
-							hash: pwd,
+							pwd: pwd,
+							mode: "login",
 							type: "seller",
-							error: "",
 						})
 					);
 					break;
 
 				case "signup":
 					dispatch(
-						AuthAction.sellerLoginAuth({
+						AuthAction.sellerRequestAuth({
 							email: email,
-							hash: pwd,
+							pwd: pwd,
+							mode: "signup",
 							type: "seller",
-							error: "",
 						})
 					);
 					break;
@@ -43,7 +48,7 @@ const SellerAuthPage = () => {
 		}
 	};
 
-	return <Auth option="seller" handler={authHandler} />;
+	return <Auth option="seller" error={error} handler={authHandler} />;
 };
 
 export default SellerAuthPage;

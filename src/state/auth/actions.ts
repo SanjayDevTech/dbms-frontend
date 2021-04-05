@@ -26,7 +26,7 @@ export const userRequestAuth = (data: FormDataType) => {
 		backendAPI
 			.post<RoleStateType>("/auth", data)
 			.then((res) => {
-				if (res.status === 200) {
+				if (res.data.error === null) {
 					dispatch(userLoginAuth(res.data));
 				} else {
 					dispatch(userFailureAuth(res.data.error));
@@ -34,8 +34,8 @@ export const userRequestAuth = (data: FormDataType) => {
 				}
 			})
 			.catch((e) => {
-				dispatch(userFailureAuth(e));
-				console.log("Error code: " + e);
+				dispatch(userFailureAuth(e.message));
+				console.log("Error code: " + e.message);
 			});
 	};
 };
@@ -64,7 +64,7 @@ export const sellerRequestAuth = (data: FormDataType) => {
 		backendAPI
 			.post<RoleStateType>("/auth", data)
 			.then((res) => {
-				if (res.status === 200) {
+				if (res.data.error === null) {
 					dispatch(sellerLoginAuth(res.data));
 				} else {
 					dispatch(sellerFailureAuth(res.data.error));
@@ -72,8 +72,8 @@ export const sellerRequestAuth = (data: FormDataType) => {
 				}
 			})
 			.catch((e) => {
-				dispatch(sellerFailureAuth(e));
-				console.log("Error code: " + e);
+				dispatch(sellerFailureAuth(e.message));
+				console.log("Error code: " + e.message);
 			});
 	};
 };

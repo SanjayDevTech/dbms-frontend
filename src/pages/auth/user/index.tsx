@@ -9,9 +9,14 @@ const UserAuthPage = () => {
 	const dispatch = useDispatch();
 	const user = useSelector(selectUserAuth);
 
+	const [error, setError] = React.useState({error: ""});
+
 	React.useEffect(() => {
 		if (user.email && user.hash) {
 			history.push("/");
+		}
+		if(user.error) {
+			setError({error: user.error});
 		}
 	}, [user]);
 
@@ -20,22 +25,22 @@ const UserAuthPage = () => {
 			switch (mode) {
 				case "login":
 					dispatch(
-						AuthAction.userLoginAuth({
+						AuthAction.userRequestAuth({
 							email: email,
-							hash: pwd,
+							pwd: pwd,
+							mode: "login",
 							type: "user",
-							error: "",
 						})
 					);
 					break;
 
 				case "signup":
 					dispatch(
-						AuthAction.userLoginAuth({
+						AuthAction.userRequestAuth({
 							email: email,
-							hash: pwd,
+							pwd: pwd,
+							mode: "signup",
 							type: "user",
-							error: "",
 						})
 					);
 					break;
@@ -43,7 +48,7 @@ const UserAuthPage = () => {
 		}
 	};
 
-	return <Auth option="user" handler={authHandler} />;
+	return <Auth option="user" error={error} handler={authHandler} />;
 };
 
 export default UserAuthPage;

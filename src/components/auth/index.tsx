@@ -1,8 +1,9 @@
-import { useState } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import { InputBase, Button, ButtonGroup } from "@material-ui/core";
 import { Lock, Mail } from "@material-ui/icons";
+import Message from "components/snackbar";
 
 const useStyles = makeStyles({
 	root: {
@@ -60,12 +61,30 @@ const useStyles = makeStyles({
 const Auth = (props: {
 	option: string;
 	handler: (email: any, pwd: any, mode: string) => void;
+	error: any;
 }) => {
 	const classes = useStyles();
 
-	const [authMode, setAuthMode] = useState("login");
-	const [email, setEmail] = useState("");
-	const [pwd, setPwd] = useState("");
+	const [authMode, setAuthMode] = React.useState("login");
+	const [email, setEmail] = React.useState("");
+	const [pwd, setPwd] = React.useState("");
+	const [snackbar, setSnackbar] = React.useState(false);
+
+	React.useEffect(() => {
+		if (props.error.error) {
+			setSnackbar(true);
+		}
+	}, [props.error]);
+
+	const snackbarHandler = (
+		event: React.SyntheticEvent | React.MouseEvent,
+		reason?: string
+	) => {
+		if (reason === "clickaway") {
+			return;
+		}
+		setSnackbar(false);
+	};
 
 	const authHandler = () => {
 		props.handler(email, pwd, authMode);
@@ -92,6 +111,11 @@ const Auth = (props: {
 
 	return (
 		<div style={{ background: bg }} className={classes.root}>
+			<Message
+				open={snackbar}
+				msg={props.error.error}
+				closeHandler={snackbarHandler}
+			/>
 			<Card className={classes.form}>
 				<div className={classes.inputBox}>
 					<div className={classes.group}>
