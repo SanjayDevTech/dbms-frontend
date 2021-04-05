@@ -1,14 +1,15 @@
 export interface RoleStateType {
 	email: string;
 	hash: string;
-	type: string;
-	error?: string;
+	type: "user" | "seller";
+	error: string | null;
 }
 
 export interface FormDataType {
 	email: string;
 	pwd: string;
-	type: string;
+	type: "user" | "seller";
+	mode: "login" | "signup";
 }
 
 export default interface AuthStateType {

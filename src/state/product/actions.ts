@@ -25,7 +25,7 @@ export const fetchRequestProduct = () => {
 	return (dispatch: Dispatch<ActionType<ProductType[] | string | boolean>>) => {
 		dispatch(fetchStatusProduct(true));
 		backendAPI
-			.get<ProductType[]>("products")
+			.get<ProductType[]>("/products")
 			.then((res) => {
 				if (res.status === 200) {
 					const products = res.data;

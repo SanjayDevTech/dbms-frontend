@@ -4,12 +4,12 @@ export interface ProductType {
 	des: string;
 	price: string;
 	cover: string;
-	sellerId: string;
+	sellerId: number;
 }
 
 export interface PurchaseType {
 	id: number;
-	userId: string;
-	productId: string;
+	userId: number;
+	productId: number;
 	status: number;
 }

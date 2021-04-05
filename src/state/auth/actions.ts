@@ -16,7 +16,7 @@ export const userLoginAuth = (
 	payload: credentials,
 });
 
-export const userFailureAuth = (error?: string): ActionType<string> => ({
+export const userFailureAuth = (error: string | null): ActionType<string> => ({
 	type: Action.AUTH_USER_FAILURE,
 	payload: error || "Unknown error",
 });
@@ -52,7 +52,9 @@ export const sellerLoginAuth = (
 	payload: credentials,
 });
 
-export const sellerFailureAuth = (error?: string): ActionType<string> => ({
+export const sellerFailureAuth = (
+	error: string | null
+): ActionType<string> => ({
 	type: Action.AUTH_SELLER_FAILURE,
 	payload: error || "Unknown error",
 });
