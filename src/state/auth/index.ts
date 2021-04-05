@@ -37,7 +37,7 @@ const authReducer = (
 		case Action.AUTH_USER_LOGIN:
 			return {
 				seller: state.seller,
-				user: action.payload,
+				user: { ...action.payload, error: "" },
 			};
 
 		case Action.AUTH_SELLER_LOGOUT:
@@ -55,7 +55,7 @@ const authReducer = (
 		case Action.AUTH_SELLER_LOGIN:
 			return {
 				user: state.user,
-				seller: action.payload,
+				seller: { ...action.payload, error: "" },
 			};
 
 		default:

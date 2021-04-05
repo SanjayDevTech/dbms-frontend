@@ -62,6 +62,7 @@ const Auth = (props: {
 	option: string;
 	handler: (email: any, pwd: any, mode: string) => void;
 	error: any;
+	clearHandler: () => void;
 }) => {
 	const classes = useStyles();
 
@@ -84,6 +85,7 @@ const Auth = (props: {
 			return;
 		}
 		setSnackbar(false);
+		props.clearHandler();
 	};
 
 	const authHandler = () => {

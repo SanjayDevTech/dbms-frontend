@@ -117,11 +117,13 @@ const Header = () => {
 	const handleUserLogout = () => {
 		dispatch(AuthAction.userLogoutAuth());
 		handleLogoutClose();
+		history.push("/");
 	};
 
 	const handleSellerLogout = () => {
 		dispatch(AuthAction.sellerLogoutAuth());
 		handleLogoutClose();
+		history.push("/");
 	};
 
 	const userNavHandler = () => {
