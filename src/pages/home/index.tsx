@@ -1,10 +1,10 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 import Header from "components/header";
 import Product from "components/product";
 import { useSelector, useDispatch } from "react-redux";
-import { selectProductData, selectProductStatus } from "state/slices";
+import { selectProductData } from "state/slices";
 import { ProductAction } from "state/actions";
 
 const useStyles = makeStyles({
@@ -19,6 +19,9 @@ const useStyles = makeStyles({
 		padding: 20,
 		overflow: "auto",
 	},
+	white: {
+		color: "#FFF",
+	},
 });
 
 const HomePage = () => {
@@ -26,6 +29,7 @@ const HomePage = () => {
 	const dispatch = useDispatch();
 	const products = useSelector(selectProductData);
 
+	// eslint-disable-next-line
 	React.useEffect(() => {
 		dispatch(ProductAction.fetchRequestProduct());
 	}, []);
@@ -35,7 +39,7 @@ const HomePage = () => {
 			<Header />
 			<div className={classes.section}>
 				<Grid container spacing={2} justify="space-around">
-					{products.length > 0 &&
+					{products?.length > 0 ? (
 						products.map((product) => (
 							<Grid key={product.id} item>
 								<Product
@@ -45,7 +49,12 @@ const HomePage = () => {
 									price={product.price}
 								/>
 							</Grid>
-						))}
+						))
+					) : (
+						<Grid item>
+							<Typography className={classes.white}>No items found</Typography>
+						</Grid>
+					)}
 				</Grid>
 			</div>
 		</div>

@@ -8,6 +8,7 @@ import Typography from "@material-ui/core/Typography";
 
 import * as Types from "./types";
 import history from "utils/history";
+import { BACKEND } from "utils/constants";
 
 const useStyles = makeStyles({
 	root: {
@@ -43,7 +44,10 @@ const useStyles = makeStyles({
 const Product = (props: Types.ProductPropsI) => {
 	const { productId, productName, cover, price } = props;
 
-	console.log(props);
+	let image = cover;
+	if (!cover.startsWith("http")) {
+		image = BACKEND + "res/" + cover;
+	}
 
 	const clickHandler = () => {
 		history.push(`/product/${productId}`);
@@ -54,7 +58,7 @@ const Product = (props: Types.ProductPropsI) => {
 		<Card className={classes.root}>
 			<CardActionArea onClick={clickHandler} className={classes.action}>
 				<CardMedia className={classes.media} title={productName}>
-					<img width={"100%"} src={cover} alt={productName} />
+					<img width={"100%"} src={image} alt={productName} />
 				</CardMedia>
 				<CardContent className={classes.content}>
 					<Typography

@@ -7,16 +7,17 @@ import {
 	InputBase,
 	Typography,
 	TextareaAutosize,
+	Box,
 } from "@material-ui/core";
 import Header from "components/header";
 import placeholder from "assets/images/placeholder.png";
-
-const listItems = [
-	{ id: "0", name: "Product Name", price: "200" },
-	{ id: "1", name: "Product Name", price: "200" },
-	{ id: "2", name: "Product Name", price: "200" },
-	{ id: "3", name: "Product Name", price: "200" },
-];
+import { useSelector } from "react-redux";
+import { ProductType } from "utils/types";
+import { backendAPI } from "services/http";
+import { selectSellerAuth } from "state/slices";
+import history from "utils/history";
+import { BACKEND } from "utils/constants";
+import Message from "components/snackbar";
 
 const useStyles = makeStyles({
 	root: {
@@ -86,7 +87,6 @@ const useStyles = makeStyles({
 		},
 	},
 	item: {
-		height: 200,
 		padding: "27px",
 		marginBottom: "34px",
 	},
@@ -108,12 +108,30 @@ const Dashboard = () => {
 	const [name, setName] = React.useState("");
 	const [des, setDes] = React.useState("");
 	const [price, setPrice] = React.useState(0);
-	const [image, setImage] = React.useState(null);
+	const [image, setImage] = React.useState<Blob | null>(null);
 	const imageUrl = React.useRef({
 		filename: "",
 		value: "",
 	});
 	const [validated, setValidated] = React.useState(false);
+	const [sellerProducts, setSellerProducts] = React.useState<ProductType[]>([]);
+	const [snackbar, setSnackbar] = React.useState({
+		msg: "",
+		open: false,
+	});
+	const [loading, setLoading] = React.useState(false);
+
+	const snackbarHandler = (
+		event: React.SyntheticEvent | React.MouseEvent,
+		reason?: string
+	) => {
+		if (reason === "clickaway") {
+			return;
+		}
+		setSnackbar({ msg: "", open: false });
+	};
+
+	const seller = useSelector(selectSellerAuth);
 
 	const clearAllFields = () => {
 		setName("");
@@ -123,8 +141,47 @@ const Dashboard = () => {
 		imageUrl.current = { value: "", filename: "" };
 	};
 
-	const addHandler = () => {
-		console.log(`Name: ${name}, Des: ${des}, price: ${price}`);
+	const addHandler = (fileName: string) => {
+		const obj: { email: string; hash: string; product: ProductType } = {
+			email: seller.email,
+			hash: seller.hash,
+			product: {
+				id: 0,
+				sellerId: 0,
+				name: name,
+				des: des,
+				price: String(price),
+				image: fileName,
+			},
+		};
+		setLoading(true);
+		backendAPI
+			.post<{
+				status: boolean;
+				error: string | null;
+			}>("/products", obj)
+			.then((res) => {
+				if (res.status === 200 && res.data.status) {
+					fetchSellerProducts();
+					clearAllFields();
+				} else {
+					console.log("Error", res.status);
+					setSnackbar({
+						msg: "Error while posting product",
+						open: false,
+					});
+				}
+			})
+			.catch((e) => {
+				console.log(e.message);
+				setSnackbar({
+					msg: e.message,
+					open: false,
+				});
+			})
+			.finally(() => {
+				setLoading(false);
+			});
 	};
 
 	const nameHandler = (e: any) => setName(e.target.value);
@@ -144,13 +201,94 @@ const Dashboard = () => {
 		setImage(file);
 	};
 
+	const pushHandler = () => {
+		if (!validated) return;
+		if (image !== null) {
+			setLoading(true);
+			const tempImage = image;
+			let data = new FormData();
+			data.append("image", tempImage);
+			backendAPI
+				.post("/images/upload", data, {
+					headers: { "Content-Type": "multipart/form-data" },
+				})
+				.then((res) => {
+					if (res.status === 200 && res.data.status) {
+						const fileName = res.data.image;
+						addHandler(fileName);
+					} else {
+						console.log("Errrr", res.data);
+						setSnackbar({
+							msg: "Error while uploading image",
+							open: false,
+						});
+					}
+				})
+				.catch((e) => {
+					console.log(e.message);
+					setSnackbar({
+						msg: e.message,
+						open: false,
+					});
+				})
+				.finally(() => {
+					setLoading(false);
+				});
+		}
+	};
+
+	const viewHandler = (id: number) => {
+		history.push(`/product/${id}`);
+	};
+
+	const deleteHandler = (id: number) => {
+		backendAPI
+			.delete(`/products/${id}`, {
+				data: {
+					email: seller.email,
+					hash: seller.hash,
+				},
+			})
+			.then((res) => {
+				const data = res.data;
+				if (data.status) {
+					fetchSellerProducts();
+				} else {
+					console.log("Error");
+				}
+			})
+			.catch(console.log);
+	};
+
 	React.useEffect(() => {
 		setValidated(Boolean(name && des && price && image));
 	}, [name, des, price, image]);
 
+	React.useEffect(() => {
+		if (seller.email && seller.hash) {
+			fetchSellerProducts();
+		}
+	}, []);
+
+	const fetchSellerProducts = () => {
+		backendAPI
+			.get<ProductType[]>(`/products?email=${seller.email}&hash=${seller.hash}`)
+			.then((response) => {
+				setSellerProducts(response.data);
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	};
+
 	return (
 		<div className={classes.root}>
 			<Header />
+			<Message
+				open={snackbar.open}
+				msg={snackbar.msg}
+				closeHandler={snackbarHandler}
+			/>
 			<div className={classes.section}>
 				<div className={classes.left}>
 					<Paper className={classes.paper}>
@@ -161,6 +299,7 @@ const Dashboard = () => {
 								placeholder={"enter the product name"}
 								className={classes.input}
 								onChange={nameHandler}
+								disabled={loading}
 							/>
 						</div>
 						<div className={classes.group}>
@@ -170,6 +309,7 @@ const Dashboard = () => {
 								placeholder={"enter the price"}
 								className={classes.input}
 								onChange={priceHandler}
+								disabled={loading}
 							/>
 						</div>
 						<div className={classes.group}>
@@ -197,6 +337,7 @@ const Dashboard = () => {
 								className={classes.input}
 								placeholder={"Description"}
 								onChange={desHandler}
+								disabled={loading}
 								style={{
 									outline: "none",
 									border: "none",
@@ -208,8 +349,8 @@ const Dashboard = () => {
 					<ButtonGroup className={classes.btnBar} color={"secondary"}>
 						<Button
 							variant={"contained"}
-							disabled={!validated}
-							onClick={addHandler}>
+							disabled={loading || !validated}
+							onClick={pushHandler}>
 							Add
 						</Button>
 						<Button
@@ -221,19 +362,42 @@ const Dashboard = () => {
 					</ButtonGroup>
 				</div>
 				<div className={classes.right}>
-					{listItems.map((item) => (
-						<Paper className={classes.item}>
-							<Typography className={classes.name} component={"h2"}>
-								{item.name}
-							</Typography>
-							<Typography className={classes.price} component={"h2"}>
-								{item.price} $
-							</Typography>
-							<Button variant={"contained"} color={"primary"}>
-								Delete
-							</Button>
-						</Paper>
-					))}
+					{sellerProducts.map((item) => {
+						let image = item.image;
+						if (!item.image.startsWith("http")) {
+							image = BACKEND + "res/" + item.image;
+						}
+						return (
+							<Paper className={classes.item}>
+								<Box display="flex">
+									<Box display="flex" flex={1} flexDirection="column">
+										<Typography className={classes.name} component={"h2"}>
+											{item.name}
+										</Typography>
+										<Typography className={classes.price} component={"h2"}>
+											{item.price} $
+										</Typography>
+									</Box>
+									<img height={"120px"} src={image} alt={item.name} />
+								</Box>
+								<Box display="flex">
+									<Button
+										onClick={() => deleteHandler(item.id)}
+										variant={"contained"}
+										color={"primary"}>
+										Delete
+									</Button>
+									<Button
+										style={{ marginLeft: "5px" }}
+										onClick={() => viewHandler(item.id)}
+										variant={"contained"}
+										color={"primary"}>
+										View
+									</Button>
+								</Box>
+							</Paper>
+						);
+					})}
 				</div>
 			</div>
 		</div>

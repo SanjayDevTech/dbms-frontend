@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { useSelector } from "react-redux";
 import { selectProductData } from "state/slices";
 import history from "utils/history";
+import { BACKEND } from "utils/constants";
 
 const useStyles = makeStyles({
 	root: {
@@ -60,15 +61,19 @@ const ProductOverviewPage = () => {
 
 	const products = useSelector(selectProductData);
 
-	const { name, price, image, des } = products.filter(
+	let { name, price, image, des } = products.filter(
 		(p) => p.id === productId
 	)[0];
+
+	if (!image.startsWith("http")) {
+		image = BACKEND + "res/" + image;
+	}
 
 	useEffect(() => {
 		if (!name) {
 			history.push("/");
 		}
-	}, []);
+	}, [name]);
 
 	return (
 		<div className={classes.root}>
