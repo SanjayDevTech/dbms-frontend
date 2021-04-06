@@ -3,10 +3,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Button, ButtonGroup, Typography } from "@material-ui/core";
 import Header from "components/header";
 import { useParams } from "react-router";
-import { useSelector } from "react-redux";
-import { selectProductData } from "state/slices";
-import history from "utils/history";
 import { BACKEND } from "utils/constants";
+import { ProductType } from "utils/types";
+import { backendAPI } from "services/http";
+import ErrorPage from "pages/info/error";
+import LoadingPage from "pages/info/loading";
 
 const useStyles = makeStyles({
 	root: {
@@ -59,46 +60,71 @@ const ProductOverviewPage = () => {
 	let { productId } = useParams<{ productId: any }>();
 	productId = Number(productId);
 
-	const products = useSelector(selectProductData);
-
-	let { name, price, image, des } = products.filter(
-		(p) => p.id === productId
-	)[0];
-
-	if (!image.startsWith("http")) {
-		image = BACKEND + "res/" + image;
-	}
+	const [product, setProduct] = React.useState<ProductType>();
+	const [error, setError] = React.useState<any | null>(null);
 
 	useEffect(() => {
-		if (!name) {
-			history.push("/");
-		}
-	}, [name]);
+		backendAPI
+			.get<{ status: boolean; error: string | null; product: ProductType }>(
+				"/products/" + productId
+			)
+			.then((res) => {
+				if (res.status === 200) {
+					const { data } = res;
+					if (data.status) {
+						const temp = data.product;
+						if (!temp.image.startsWith("http")) {
+							temp.image = BACKEND + "res/" + temp.image;
+						}
+						setProduct(temp);
+						setError(null);
+					} else {
+						console.log(data.error);
+						setError({ code: 404 });
+					}
+				} else {
+					setError({ code: 500 });
+					console.log("Error code: " + res.status);
+				}
+			})
+			.catch((e) => {
+				console.log(e);
+				setError({ code: 500 });
+			});
+	}, []);
 
 	return (
 		<div className={classes.root}>
 			<Header />
 			<div className={classes.section}>
-				<div className={classes.left}>
-					<div>
-						<img width={"100%"} src={image} alt={name} />
-					</div>
-					<ButtonGroup color={"primary"} className={classes.btnBar}>
-						<Button variant={"contained"}>Buy now</Button>
-						<Button>Add to cart</Button>
-					</ButtonGroup>
-				</div>
-				<div className={classes.right}>
-					<Typography className={classes.name} component={"h3"}>
-						{name}
-					</Typography>
-					<Typography className={classes.price} component={"h3"}>
-						{price} $
-					</Typography>
-					<Typography className={classes.des} component={"p"}>
-						{des}
-					</Typography>
-				</div>
+				{error ? (
+					<ErrorPage error={error.code} />
+				) : product ? (
+					<>
+						<div className={classes.left}>
+							<div>
+								<img width={"100%"} src={product.image} alt={product.name} />
+							</div>
+							<ButtonGroup color={"primary"} className={classes.btnBar}>
+								<Button variant={"contained"}>Buy now</Button>
+								<Button>Add to cart</Button>
+							</ButtonGroup>
+						</div>
+						<div className={classes.right}>
+							<Typography className={classes.name} component={"h3"}>
+								{product.name}
+							</Typography>
+							<Typography className={classes.price} component={"h3"}>
+								{product.price} $
+							</Typography>
+							<Typography className={classes.des} component={"p"}>
+								{product.des}
+							</Typography>
+						</div>
+					</>
+				) : (
+					<LoadingPage />
+				)}
 			</div>
 		</div>
 	);

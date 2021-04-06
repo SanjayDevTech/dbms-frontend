@@ -1,6 +1,5 @@
 import { ProductType } from "utils/types";
 import AuthStateType from "./auth/types";
-import ProductStateType from "./product/types";
 
 export interface ActionType<T> {
 	type: string;
@@ -9,6 +8,5 @@ export interface ActionType<T> {
 
 export default interface ReduxStateType {
 	cart: ProductType[];
-	product: ProductStateType;
 	auth: AuthStateType;
 }

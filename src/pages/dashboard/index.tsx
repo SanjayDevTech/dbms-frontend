@@ -277,7 +277,7 @@ const Dashboard = () => {
 				setSellerProducts(response.data);
 			})
 			.catch((e) => {
-				console.log(e);
+				setSnackbar({ msg: "Error while fetching details", open: true });
 			});
 	};
 

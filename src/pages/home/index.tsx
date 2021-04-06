@@ -3,9 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Grid, Typography } from "@material-ui/core";
 import Header from "components/header";
 import Product from "components/product";
-import { useSelector, useDispatch } from "react-redux";
-import { selectProductData } from "state/slices";
-import { ProductAction } from "state/actions";
+import { ProductType } from "utils/types";
+import { backendAPI } from "services/http";
 
 const useStyles = makeStyles({
 	root: {
@@ -26,12 +25,23 @@ const useStyles = makeStyles({
 
 const HomePage = () => {
 	const classes = useStyles();
-	const dispatch = useDispatch();
-	const products = useSelector(selectProductData);
+	const [products, setProducts] = React.useState<ProductType[]>([]);
+	const [error, setError] = React.useState("");
 
 	// eslint-disable-next-line
 	React.useEffect(() => {
-		dispatch(ProductAction.fetchRequestProduct());
+		backendAPI
+			.get<ProductType[]>("/products?query=")
+			.then((res) => {
+				if (res.status === 200) {
+					setProducts(res.data);
+				} else {
+					setError("Error code: " + res.status);
+				}
+			})
+			.catch((e) => {
+				setError(e.message);
+			});
 	}, []);
 
 	return (
@@ -39,7 +49,7 @@ const HomePage = () => {
 			<Header />
 			<div className={classes.section}>
 				<Grid container spacing={2} justify="space-around">
-					{products?.length > 0 ? (
+					{products?.length > 0 &&
 						products.map((product) => (
 							<Grid key={product.id} item>
 								<Product
@@ -49,10 +59,10 @@ const HomePage = () => {
 									price={product.price}
 								/>
 							</Grid>
-						))
-					) : (
+						))}
+					{error && (
 						<Grid item>
-							<Typography className={classes.white}>No items found</Typography>
+							<Typography className={classes.white}>{error}</Typography>
 						</Grid>
 					)}
 				</Grid>
