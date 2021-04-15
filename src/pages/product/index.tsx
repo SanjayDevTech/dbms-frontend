@@ -8,6 +8,10 @@ import { ProductType } from "utils/types";
 import { backendAPI } from "services/http";
 import ErrorPage from "pages/info/error";
 import LoadingPage from "pages/info/loading";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCart } from "state/slices";
+import Message from "components/snackbar";
+import { CartAction } from "state/actions";
 
 const useStyles = makeStyles({
 	root: {
@@ -62,6 +66,47 @@ const ProductOverviewPage = () => {
 
 	const [product, setProduct] = React.useState<ProductType>();
 	const [error, setError] = React.useState<any | null>(null);
+	const [snackbar, setSnackbar] = React.useState({ open: false, msg: "" });
+
+	const cartList = useSelector(selectCart);
+	const dispatch = useDispatch();
+
+	const addToCartHandler = () => {
+		if (cartList.findIndex((c) => c.id === productId) >= 0) return;
+		backendAPI
+			.get<{ status: boolean; error: string | null; product: ProductType }>(
+				"/products/" + productId
+			)
+			.then((res) => {
+				if (res.status === 200) {
+					const { data } = res;
+					if (data.status) {
+						const temp = data.product;
+						if (!temp.image.startsWith("http")) {
+							temp.image = BACKEND + "res/" + temp.image;
+						}
+						dispatch(CartAction.addCart(temp));
+					} else {
+						console.log(data.error);
+						setSnackbar({
+							open: true,
+							msg: "Product not found, please reload this page",
+						});
+					}
+				} else {
+					setSnackbar({ open: true, msg: "Internal server error" });
+					console.log("Error code: " + res.status);
+				}
+			})
+			.catch((e) => {
+				console.log(e);
+				setSnackbar({ open: true, msg: "Oops! something went wrong" });
+			});
+	};
+
+	const snackbarHandler = () => {
+		setSnackbar({ open: false, msg: "" });
+	};
 
 	useEffect(() => {
 		backendAPI
@@ -93,9 +138,16 @@ const ProductOverviewPage = () => {
 			});
 	}, []);
 
+	const isAddedToCart = cartList.findIndex((c) => c.id === productId) >= 0;
+
 	return (
 		<div className={classes.root}>
 			<Header />
+			<Message
+				open={snackbar.open}
+				msg={snackbar.msg}
+				closeHandler={snackbarHandler}
+			/>
 			<div className={classes.section}>
 				{error ? (
 					<ErrorPage error={error.code} />
@@ -107,7 +159,9 @@ const ProductOverviewPage = () => {
 							</div>
 							<ButtonGroup color={"primary"} className={classes.btnBar}>
 								<Button variant={"contained"}>Buy now</Button>
-								<Button>Add to cart</Button>
+								<Button onClick={addToCartHandler} disabled={isAddedToCart}>
+									{isAddedToCart ? "Added to cart" : "Add to cart"}
+								</Button>
 							</ButtonGroup>
 						</div>
 						<div className={classes.right}>

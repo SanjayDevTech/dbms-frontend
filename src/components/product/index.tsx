@@ -21,7 +21,8 @@ const useStyles = makeStyles({
 		padding: "30px",
 	},
 	content: {
-		padding: "16px 0",
+		padding: 0,
+		marginTop: 28,
 	},
 	media: {
 		width: "287px",
