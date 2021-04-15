@@ -13,3 +13,9 @@ export interface PurchaseType {
 	productId: number;
 	status: number;
 }
+
+export interface OrderType {
+	id: number;
+	name: string;
+	status: number;
+}

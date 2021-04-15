@@ -220,7 +220,7 @@ const Dashboard = () => {
 						console.log("Errrr", res.data);
 						setSnackbar({
 							msg: "Error while uploading image",
-							open: false,
+							open: true,
 						});
 					}
 				})
@@ -228,7 +228,7 @@ const Dashboard = () => {
 					console.log(e.message);
 					setSnackbar({
 						msg: e.message,
-						open: false,
+						open: true,
 					});
 				})
 				.finally(() => {

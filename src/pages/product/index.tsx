@@ -1,6 +1,16 @@
 import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, ButtonGroup, Typography } from "@material-ui/core";
+import {
+	Button,
+	ButtonGroup,
+	Typography,
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	Slide,
+} from "@material-ui/core";
 import Header from "components/header";
 import { useParams } from "react-router";
 import { BACKEND } from "utils/constants";
@@ -9,9 +19,17 @@ import { backendAPI } from "services/http";
 import ErrorPage from "pages/info/error";
 import LoadingPage from "pages/info/loading";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCart } from "state/slices";
+import { selectCart, selectUserAuth } from "state/slices";
 import Message from "components/snackbar";
 import { CartAction } from "state/actions";
+import { TransitionProps } from "@material-ui/core/transitions";
+
+const Transition = React.forwardRef(function Transition(
+	props: TransitionProps & { children?: React.ReactElement<any, any> },
+	ref: React.Ref<unknown>
+) {
+	return <Slide direction="up" ref={ref} {...props} />;
+});
 
 const useStyles = makeStyles({
 	root: {
@@ -67,8 +85,10 @@ const ProductOverviewPage = () => {
 	const [product, setProduct] = React.useState<ProductType>();
 	const [error, setError] = React.useState<any | null>(null);
 	const [snackbar, setSnackbar] = React.useState({ open: false, msg: "" });
+	const [buyNowDialog, setBuyNowDialog] = React.useState(false);
 
 	const cartList = useSelector(selectCart);
+	const user = useSelector(selectUserAuth);
 	const dispatch = useDispatch();
 
 	const addToCartHandler = () => {
@@ -106,6 +126,52 @@ const ProductOverviewPage = () => {
 
 	const snackbarHandler = () => {
 		setSnackbar({ open: false, msg: "" });
+	};
+
+	const handleDialogOpen = () => {
+		setBuyNowDialog(true);
+	};
+
+	const handleDialogClose = () => {
+		setBuyNowDialog(false);
+	};
+
+	const purchaseProduct = () => {
+		backendAPI
+			.post("/purchases", {
+				email: user.email,
+				hash: user.hash,
+				purchase: {
+					id: 0,
+					userId: 0,
+					productId: product?.id,
+					status: 0,
+				},
+			})
+			.then((res) => {
+				if (res.status === 200 && res.data.status) {
+					setSnackbar({
+						msg: "Succesfully ordered ur product",
+						open: true,
+					});
+				} else {
+					console.log("Error");
+					setSnackbar({
+						msg: res.data.error || "Errorrr",
+						open: true,
+					});
+				}
+			})
+			.catch((e) => {
+				console.log(e.message);
+				setSnackbar({
+					msg: e.message,
+					open: true,
+				});
+			})
+			.finally(() => {
+				handleDialogClose();
+			});
 	};
 
 	useEffect(() => {
@@ -148,6 +214,28 @@ const ProductOverviewPage = () => {
 				msg={snackbar.msg}
 				closeHandler={snackbarHandler}
 			/>
+			<Dialog
+				open={buyNowDialog}
+				TransitionComponent={Transition}
+				keepMounted
+				onClose={handleDialogClose}
+				aria-labelledby="alert-dialog-slide-title"
+				aria-describedby="alert-dialog-slide-description">
+				<DialogTitle id="alert-dialog-slide-title">{"Checkout"}</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-slide-description">
+						Do u want to buy {product?.name}?
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={handleDialogClose} color="primary">
+						No
+					</Button>
+					<Button onClick={purchaseProduct} color="primary">
+						Yes
+					</Button>
+				</DialogActions>
+			</Dialog>
 			<div className={classes.section}>
 				{error ? (
 					<ErrorPage error={error.code} />
@@ -158,7 +246,9 @@ const ProductOverviewPage = () => {
 								<img width={"100%"} src={product.image} alt={product.name} />
 							</div>
 							<ButtonGroup color={"primary"} className={classes.btnBar}>
-								<Button variant={"contained"}>Buy now</Button>
+								<Button onClick={handleDialogOpen} variant={"contained"}>
+									Buy now
+								</Button>
 								<Button onClick={addToCartHandler} disabled={isAddedToCart}>
 									{isAddedToCart ? "Added to cart" : "Add to cart"}
 								</Button>
