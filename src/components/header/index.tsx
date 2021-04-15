@@ -79,6 +79,9 @@ const useStyles = makeStyles((theme: Theme) =>
 			width: 30,
 			height: 30,
 		},
+		header: {
+			cursor: "pointer",
+		},
 	})
 );
 
@@ -147,7 +150,11 @@ const Header = () => {
 			<div className={classes.grow}>
 				<AppBar className={classes.appbar} position="static">
 					<Toolbar>
-						<Typography onClick={homeNavHandler} variant="h6" noWrap>
+						<Typography
+							className={classes.header}
+							onClick={homeNavHandler}
+							variant="h6"
+							noWrap>
 							E Commerce
 						</Typography>
 						<div className={classes.grow} />

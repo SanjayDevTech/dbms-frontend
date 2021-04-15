@@ -65,7 +65,7 @@ const CartPage = () => {
 			<Header />
 			<div className={classes.section}>
 				<Paper className={classes.content}>
-					<Box display={"flex"} flexDirection={"column"}>
+					<Box display={"flex"} height={"100%"} flexDirection={"column"}>
 						{cartList.length > 0 ? (
 							cartList.map((cart) => (
 								<Box
@@ -87,7 +87,14 @@ const CartPage = () => {
 								</Box>
 							))
 						) : (
-							<Typography>Nothing in the cart</Typography>
+							<Box
+								flex={"1"}
+								height={"100%"}
+								display={"flex"}
+								justifyContent={"center"}
+								alignItems={"center"}>
+								<Typography>Nothing in the cart</Typography>
+							</Box>
 						)}
 					</Box>
 				</Paper>
